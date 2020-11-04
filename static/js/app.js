@@ -4,15 +4,15 @@ var token = ""
 jQuery(document).ready(function () {
     var slider = $('#max_words')
     slider.on('change mousemove', function (evt) {
-        $('#label_max_words').text('Top k words: ' + slider.val())
+        $('#label_max_words').text('Top k choices: ' + slider.val())
     })
 
     var slider_mask = $('#max_words_mask')
     slider_mask.on('change mousemove', function (evt) {
-        $('#label_max_words').text('Top k words: ' + slider_mask.val())
+        $('#label_max_words').text('Top k choices: ' + slider_mask.val())
     })
 
-    $('#input_text').on('keyup', function (e) {
+    $('#ca_input_text').on('keyup', function (e) {
         if (e.key == ' ') {
             $.ajax({
                 url: '/get_end_predictions',
@@ -20,7 +20,9 @@ jQuery(document).ready(function () {
                 contentType: "application/json",
                 dataType: "json",
                 data: JSON.stringify({
-                    "input_text": $('#input_text').val(),
+                    "input_text": $('#ca_input_text').val(),
+                    "question": $('#ca_input_q').val(),
+                    "choices": $('#ca_input_choices').val(),
                     "top_k": slider.val(),
                 }),
                 beforeSend: function () {
@@ -31,6 +33,7 @@ jQuery(document).ready(function () {
                 }
             }).done(function (jsondata, textStatus, jqXHR) {
                 console.log(jsondata)
+                $('#text_uqa_large').val(jsondata['uqalarge'])
                 $('#text_bert').val(jsondata['bert'])
                 $('#text_xlnet').val(jsondata['xlnet'])
                 $('#text_xlm').val(jsondata['xlm'])
@@ -42,6 +45,8 @@ jQuery(document).ready(function () {
             });
         }
     })
+
+
 
     $('#btn-process').on('click', function () {
         $.ajax({

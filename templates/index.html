@@ -27,39 +27,57 @@
 
         <div class="col-sm-10">
             <center>
-                <h3>Word Prediction with Transformers</h3>
+                <h3>Question Answering with Transformers</h3>
             </center>
             <div class="form-row">
                 <div class="form-group col-md-8">
                     <br>
-                    <h4>Type a word and press space to get suggestions</h4>
+                    <h4>Cosmos QA: Type a prompt, a question, and atleast one choice seperated by a newline and press space to get suggestions</h4>
                 </div>
                 <div class="form-group col-md-4">
                     <br>
-                    <label for="max_words" id="label_max_words">Top k words: 5</label>
-                    <input type="range" class="custom-range" min="1" max="10" value="5" step="1" id="max_words">
+                    <label for="max_words" id="label_max_words">Top k choices: 2</label>
+                    <input type="range" class="custom-range" min="1" max="4" value="2" step="1" id="max_words">
                 </div>
             </div>
 
+            <h6>Prompt</h6>
             <div class="form-row">
-                <textarea class="form-control txt_input" id="input_text" rows="1"></textarea>
+                <textarea class="form-control txt_input" id="ca_input_text" rows="5">It's a very humbling experience when you need someone to dress you every morning, tie your shoes, and put your hair up. Every menial task takes an unprecedented amount of effort. It made me appreciate Dan even more. But anyway I shan't dwell on this (I'm not dying after all) and not let it detact from my lovely 5 days with my friends visiting from Jersey.</textarea>
+            </div>
+            <br>
+            <h6>Question</h6>
+            <div class="form-row">
+                <textarea class="form-control txt_input" id="ca_input_q" rows="1">What's a possible reason the writer needed someone to dress him every morning?</textarea>
+            </div>        
+            <br>    
+            <h6>Choices: If only one choice, some models will output whether the choice is true or false. <b>Choice limit: 4</b></h6>
+            <div class="form-row">
+                <textarea class="form-control txt_input" id="ca_input_choices" rows="4">The writer doesn't like putting effort into these tasks.
+The writer has a phyiscal disability.
+The writer is bad at doing his own hair.
+None of the above choices.</textarea>
             </div>
 
             <h4> Predictions </h4>
             <div class="form-row">
                 <div class="form-group col-md-2">
-                    <label for="text_paragraphs">BERT</label>
+                    <label for="text_paragraphs">Unified QA large</label>
+                    <textarea class="form-control txt_response" id="text_uqa_large" readonly></textarea>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="text_paragraphs">Unified QA 3B</label>
                     <textarea class="form-control txt_response" id="text_bert" readonly></textarea>
                 </div>
                 <div class="form-group col-md-2">
-                    <label for="text_paragraphs">XLNET</label>
+                    <label for="text_paragraphs">Finetuned T5-Large</label>
                     <textarea class="form-control txt_response" id="text_xlnet" readonly></textarea>
                 </div>
                 <div class="form-group col-md-2">
-                    <label for="text_paragraphs">XLM-Roberta</label>
+                    <label for="text_paragraphs">Finetuned T5-3B</label>
                     <textarea class="form-control txt_response" id="text_xlm" readonly></textarea>
                 </div>
-                <div class="form-group col-md-2">
+                <!-- <div class="form-group col-md-2">
                     <label for="text_paragraphs">BART</label>
                     <textarea class="form-control txt_response" id="text_bart" readonly></textarea>
                 </div>
@@ -70,7 +88,7 @@
                 <div class="form-group col-md-2">
                     <label for="text_paragraphs">ROBERTA</label>
                     <textarea class="form-control txt_response" id="text_roberta" readonly></textarea>
-                </div>
+                </div> -->
             </div>
             <hr>
 

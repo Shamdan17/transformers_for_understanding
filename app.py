@@ -15,12 +15,15 @@ def index():
 def get_prediction_eos():
     try:
         input_text = ' '.join(request.json['input_text'].split())
-        input_text += ' <mask>'
+        # input_text += ' <mask>'
+        q = request.json['question']
+        c = request.json['choices']
         top_k = request.json['top_k']
-        res = main.get_all_predictions(input_text, top_clean=int(top_k))
+        res = main.get_all_predictions(input_text,q, c, top_clean=int(top_k))
         return app.response_class(response=json.dumps(res), status=200, mimetype='application/json')
     except Exception as error:
         err = str(error)
+        print("ERROR HERE")
         print(err)
         return app.response_class(response=json.dumps(err), status=500, mimetype='application/json')
 
