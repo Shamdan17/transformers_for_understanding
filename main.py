@@ -2,9 +2,9 @@
 import torch
 import string
 
-from transformers import BertTokenizer, BertForMaskedLM
-bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-bert_model = BertForMaskedLM.from_pretrained('bert-base-uncased').eval()
+# from transformers import BertTokenizer, BertForMaskedLM
+# bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+# bert_model = BertForMaskedLM.from_pretrained('bert-base-uncased').eval()
 
 from transformers import AutoTokenizer, T5ForConditionalGeneration
 
@@ -12,13 +12,27 @@ unifiedqa_t5_large = "allenai/unifiedqa-t5-large" # you can specify the model si
 unifiedqa_t5_large_tok = AutoTokenizer.from_pretrained(unifiedqa_t5_large)
 unifiedqa_t5_large = T5ForConditionalGeneration.from_pretrained(unifiedqa_t5_large)
 
+unifiedqa_t5_3B = "allenai/unifiedqa-t5-3B" # you can specify the model size here
+3Bconfig = AutoConfig.from_pretrained('t5-3B')
+unifiedqa_t5_3B_tok = AutoTokenizer.from_pretrained(unifiedqa_t5_3B)
+# Hot fix until huggingface issue is fixed
+unifiedqa_t5_3B = T5ForConditionalGeneration.from_pretrained("./unifiedqa/3B/model.ckpt-1100500.index", from_tf=True, config=3Bconfig)
+
+# unifiedqa_t5_large = "allenai/unifiedqa-t5-large" # you can specify the model size here
+largeconfig = AutoConfig.from_pretrained('t5-large')
+t5_large_tok = AutoTokenizer.from_pretrained("t5-large")
+t5_large = T5ForConditionalGeneration.from_pretrained("./t5_large/model.ckpt-1025700.index", from_tf=True, config=largeconfig)
+
+t5_3B_tok = AutoTokenizer.from_pretrained("t5-large")
+t5_3B = T5ForConditionalGeneration.from_pretrained("./t5_large/model.ckpt-1025700.index", from_tf=True, config=3Bconfig)
+
 # from transformers import XLNetTokenizer, XLNetLMHeadModel
 # xlnet_tokenizer = XLNetTokenizer.from_pretrained('xlnet-base-cased')
 # xlnet_model = XLNetLMHeadModel.from_pretrained('xlnet-base-cased').eval()
 
-# from transformers import XLMRobertaTokenizer, XLMRobertaForMaskedLM
-# xlmroberta_tokenizer = XLMRobertaTokenizer.from_pretrained('xlm-roberta-base')
-# xlmroberta_model = XLMRobertaForMaskedLM.from_pretrained('xlm-roberta-base').eval()
+from transformers import XLMRobertaTokenizer, XLMRobertaForMaskedLM
+xlmroberta_tokenizer = XLMRobertaTokenizer.from_pretrained('xlm-roberta-large')
+xlmroberta_model = XLMRobertaForMaskedLM.from_pretrained('xlm-roberta-large').eval()
 
 # from transformers import BartTokenizer, BartForConditionalGeneration
 # bart_tokenizer = BartTokenizer.from_pretrained('facebook/bart-large')
@@ -28,9 +42,9 @@ unifiedqa_t5_large = T5ForConditionalGeneration.from_pretrained(unifiedqa_t5_lar
 # electra_tokenizer = ElectraTokenizer.from_pretrained('google/electra-small-generator')
 # electra_model = ElectraForMaskedLM.from_pretrained('google/electra-small-generator').eval()
 
-# from transformers import RobertaTokenizer, RobertaForMaskedLM
-# roberta_tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
-# roberta_model = RobertaForMaskedLM.from_pretrained('roberta-base').eval()
+from transformers import RobertaTokenizer, RobertaForMaskedLM
+roberta_tokenizer = RobertaTokenizer.from_pretrained('roberta-large')
+roberta_model = RobertaForMaskedLM.from_pretrained('roberta-large').eval()
 
 top_k = 10
 
@@ -60,6 +74,19 @@ def run_t5(input_string, model, tokenizer, **generator_args):
     res = model.generate(input_ids, **generator_args)
     return [tokenizer.decode(x) for x in res]
 
+def run_pt_t5(input_string, model, tokenizer, **generator_args):
+    tokenized = tokenizer.batch_encode_plus(
+        [input_string], max_length=512, return_tensors="pt",
+    )
+
+    generated_ids = model.generate(input_ids=tokenized['input_ids'], **generator_args)
+    preds = [
+                tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+                for g in generated_ids
+            ]
+    # print(preds)
+    return preds
+
 
 def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
     # ========================= Unified QA ================================
@@ -70,16 +97,31 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
         joined.append(f"({chr(ord('a')+i)}) {choice}")
     joined = " ".join(joined)
     uqa_input = f"{question} \\n {joined} \\n {text_sentence}"
-    print(uqa_input)
+    # print(uqa_input)
     uqa_large = '\n'.join(run_t5(uqa_input, unifiedqa_t5_large, unifiedqa_t5_large_tok, num_beams=4*top_clean, num_return_sequences=top_clean))
-    print(uqa_large)
+    # print(uqa_large)
+
+    uqa_3b = '\n'.join(run_t5(uqa_input, unifiedqa_t5_3B, unifiedqa_t5_3B_tok, num_beams=4*top_clean, num_return_sequences=top_clean))
+
+
+    joined_t5 = []
+    for i, choice in enumerate(choices):
+        joined.append(f"choice {i}: <{choice}>")
+    joined_t5 = " ".join(joined)
+
+    t5_inp = f"question: <{question}> {joined_t5} article {text_sentence}"
+
+    t5_large_op = '\n'.join(run_t5(t5_inp, t5_large, t5_large_tok, num_beams=4*top_clean, num_return_sequences=top_clean))
+
+    t5_3B_op = '\n'.join(run_t5(t5_inp, t5_3B, t5_3B_tok, num_beams=4*top_clean, num_return_sequences=top_clean))
+
 
     # ========================= BERT =================================
-    print(text_sentence)
-    input_ids, mask_idx = encode(bert_tokenizer, text_sentence+ " <mask>")
-    with torch.no_grad():
-        predict = bert_model(input_ids)[0]
-    bert = decode(bert_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    # print(text_sentence)
+    # input_ids, mask_idx = encode(bert_tokenizer, text_sentence+ " <mask>")
+    # with torch.no_grad():
+    #     predict = bert_model(input_ids)[0]
+    # bert = decode(bert_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
 
     # # ========================= XLNET LARGE =================================
     # input_ids, mask_idx = encode(xlnet_tokenizer, text_sentence, False)
@@ -93,10 +135,10 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
     # xlnet = decode(xlnet_tokenizer, predict[0, 0, :].topk(top_k).indices.tolist(), top_clean)
 
     # # ========================= XLM ROBERTA BASE =================================
-    # input_ids, mask_idx = encode(xlmroberta_tokenizer, text_sentence, add_special_tokens=True)
-    # with torch.no_grad():
-    #     predict = xlmroberta_model(input_ids)[0]
-    # xlm = decode(xlmroberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    input_ids, mask_idx = encode(xlmroberta_tokenizer, f"Prompt: {text_sentence} question: {question} {joined_t5}+ The correct choice is choice number: <mask>", add_special_tokens=True)
+    with torch.no_grad():
+        predict = xlmroberta_model(input_ids)[0]
+    xlm = decode(xlmroberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
 
     # # ========================= BART =================================
     # input_ids, mask_idx = encode(bart_tokenizer, text_sentence, add_special_tokens=True)
@@ -111,18 +153,21 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
     # electra = decode(electra_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
 
     # # ========================= ROBERTA =================================
-    # input_ids, mask_idx = encode(roberta_tokenizer, text_sentence, add_special_tokens=True)
-    # with torch.no_grad():
-    #     predict = roberta_model(input_ids)[0]
-    # roberta = decode(roberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    input_ids, mask_idx = encode(roberta_tokenizer, f"Prompt: {text_sentence} question: {question} {joined_t5}+ The correct choice is choice number: <mask>", add_special_tokens=True)
+    with torch.no_grad():
+        predict = roberta_model(input_ids)[0]
+    roberta = decode(roberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
 
     return {'uqalarge': uqa_large,
-            'bert': bert,
-            'xlnet': bert,
-            'xlm': bert,
-            'bart': bert,
-            'electra': bert,
-            'roberta': bert}
+            'uqa3B' : uqa_3b,
+            't5_large': t5_large_op,
+            't5_3b': t5_3B_op
+            # 'bert': bert,
+            # 'xlnet': bert,
+            'xlm': xlm,
+            # 'bart': bert,
+            # 'electra': bert,
+            'roberta': roberta}
 
     # return {'bert': bert,
     #         'xlnet': xlnet,
