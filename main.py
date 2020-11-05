@@ -163,7 +163,7 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
     opdct = {'uqalarge': uqa_large,
             'uqa3B' : uqa_3b,
             't5_large': t5_large_op,
-            't5_3b': t5_3B_op
+            't5_3b': t5_3B_op,
             # 'bert': bert,
             # 'xlnet': bert,
             'xlm': xlm,
