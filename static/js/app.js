@@ -87,7 +87,7 @@ jQuery(document).ready(function () {
     // })
 
         $('#btn-process-cqa').on('click', function () {
-        if (e.key == ' ') {
+        // if (e.key == ' ') {
             $.ajax({
                 url: '/get_end_predictions',
                 type: "post",
@@ -119,8 +119,8 @@ jQuery(document).ready(function () {
                 $('#text_roberta').val(jsondata['roberta'])
             }).fail(function (jsondata, textStatus, jqXHR) {
                 console.log(jsondata)
-            });
-        }
+        });
+        // }
     })
 
 
