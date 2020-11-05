@@ -108,7 +108,7 @@ jQuery(document).ready(function () {
             }).done(function (jsondata, textStatus, jqXHR) {
                 console.log(jsondata)
                 $('#text_uqa_large').val(jsondata['uqalarge'])
-                $('#text_uqa_3B').val(jsondata['uqa3b'])
+                $('#text_uqa_3B').val(jsondata['uqa3B'])
                 $('#text_T5_large').val(jsondata['t5_large'])
                 $('#text_T5_3B').val(jsondata['t5_3b'])
                 // $('#text_bert').val(jsondata['bert'])

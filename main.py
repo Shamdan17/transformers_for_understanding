@@ -107,11 +107,11 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
     joined_t5 = []
     for i, choice in enumerate(choices):
         joined_t5.append(f"choice {i}: <{choice}>")
-    joined_t5 = " ".join(joined)
+    joined_t5 = " ".join(joined_t5)
 
     t5_inp = f"question: <{question}> {joined_t5} article {text_sentence}"
 
-    print(f"uqa input: {t5_inp}")
+    print(f"t5 input: {t5_inp}")
     t5_large_op = '\n'.join(run_t5(t5_inp.lower(), t5_large, t5_large_tok, num_beams=4*top_clean, num_return_sequences=top_clean))
 
     t5_3B_op = '\n'.join(run_t5(t5_inp.lower(), t5_3B, t5_3B_tok, num_beams=4*top_clean, num_return_sequences=top_clean))
@@ -171,7 +171,9 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
             # 'electra': bert,
             'roberta': roberta}
 
-    print(f"Outputs: {opdct}")
+    print("Outputs:")
+    for k in opdct:
+        print(f"{k} : {opdct[k]}")
 
     return opdct
 
