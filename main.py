@@ -6,7 +6,7 @@ import string
 # bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 # bert_model = BertForMaskedLM.from_pretrained('bert-base-uncased').eval()
 
-from transformers import AutoTokenizer, T5ForConditionalGeneration
+from transformers import AutoTokenizer, T5ForConditionalGeneration, AutoConfig
 
 unifiedqa_t5_large = "allenai/unifiedqa-t5-large" # you can specify the model size here
 unifiedqa_t5_large_tok = AutoTokenizer.from_pretrained(unifiedqa_t5_large)
