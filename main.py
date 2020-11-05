@@ -69,12 +69,12 @@ def encode(tokenizer, text_sentence, add_special_tokens=True):
     mask_idx = torch.where(input_ids == tokenizer.mask_token_id)[1].tolist()[0]
     return input_ids, mask_idx
 
-def run_t5(input_string, model, tokenizer,choices, **generator_args):
+def run_t5(input_string, model, tokenizer, **generator_args):
     input_ids = tokenizer.encode(input_string, return_tensors="pt")
     res = model.generate(input_ids, **generator_args)
     return [tokenizer.decode(x) for x in res]
 
-def run_pt_t5(input_string, model, tokenizer, **generator_args):
+def run_pt_t5(input_string, model, tokenizer,choices, **generator_args):
     tokenized = tokenizer.batch_encode_plus(
         [input_string], max_length=512, return_tensors="pt",
     )
@@ -124,9 +124,9 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
     t5_inp = f"question: <{question}> {joined_t5} article {text_sentence}"
 
     print(f"t5 input: {t5_inp}")
-    t5_large_op = '\n'.join(run_t5("trivia question: " + t5_inp.lower(), t5_large, t5_large_tok, choices,  num_beams=4*top_clean, num_return_sequences=top_clean))
+    t5_large_op = '\n'.join(run_pt_t5("trivia question: " + t5_inp.lower(), t5_large, t5_large_tok, choices,  num_beams=4*top_clean, num_return_sequences=top_clean))
 
-    t5_3B_op = '\n'.join(run_t5(t5_inp.lower(), t5_3B, t5_3B_tok, choices, num_beams=4*top_clean, num_return_sequences=top_clean))
+    t5_3B_op = '\n'.join(run_pt_t5(t5_inp.lower(), t5_3B, t5_3B_tok, choices, num_beams=4*top_clean, num_return_sequences=top_clean))
 
 
     # ========================= BERT =================================
