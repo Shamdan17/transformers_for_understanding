@@ -58,6 +58,14 @@ def decode(tokenizer, pred_idx, top_clean):
             tokens.append(token.replace('##', ''))
     return '\n'.join(tokens[:top_clean])
 
+def decode_plus(tokenizer, pred_idx, top_clean, choices):
+    ignore_tokens = string.punctuation + '[PAD]'
+    tokens = []
+    for w in pred_idx:
+        token = ''.join(tokenizer.decode(w).split())
+        if token not in ignore_tokens:
+            tokens.append(token.replace('##', ''))
+    return '\n'.join(num_to_choice(tokens[:top_clean], choices))
 
 def encode(tokenizer, text_sentence, add_special_tokens=True):
     text_sentence = text_sentence.replace('<mask>', tokenizer.mask_token)
@@ -110,10 +118,10 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
     joined = " ".join(joined)
     uqa_input = f"{question} \\n {joined} \\n {text_sentence}"
     print(f"uqa input: {uqa_input}")
-    uqa_large = '\n'.join(run_t5(uqa_input, unifiedqa_t5_large, unifiedqa_t5_large_tok, num_beams=4*top_clean, num_return_sequences=top_clean))
+    uqa_large = '\n'.join(run_t5(uqa_input, unifiedqa_t5_large, unifiedqa_t5_large_tok, num_beams=2*top_clean, num_return_sequences=top_clean))
     # print(uqa_large)
 
-    uqa_3b = '\n'.join(run_t5(uqa_input, unifiedqa_t5_3B, unifiedqa_t5_3B_tok, num_beams=4*top_clean, num_return_sequences=top_clean))
+    uqa_3b = '\n'.join(run_t5(uqa_input, unifiedqa_t5_3B, unifiedqa_t5_3B_tok, num_beams=2*top_clean, num_return_sequences=top_clean))
 
 
     joined_t5 = []
@@ -124,9 +132,9 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
     t5_inp = f"question: <{question}> {joined_t5} article {text_sentence}"
 
     print(f"t5 input: {t5_inp}")
-    t5_large_op = '\n'.join(run_pt_t5("trivia question: " + t5_inp.lower(), t5_large, t5_large_tok, choices,  num_beams=4*top_clean, num_return_sequences=top_clean))
+    t5_large_op = '\n'.join(run_pt_t5("trivia question: " + t5_inp.lower(), t5_large, t5_large_tok, choices,  num_beams=2*top_clean, num_return_sequences=top_clean))
 
-    t5_3B_op = '\n'.join(run_pt_t5(t5_inp.lower(), t5_3B, t5_3B_tok, choices, num_beams=4*top_clean, num_return_sequences=top_clean))
+    t5_3B_op = '\n'.join(run_pt_t5(t5_inp.lower(), t5_3B, t5_3B_tok, choices, num_beams=2*top_clean, num_return_sequences=top_clean))
 
 
     # ========================= BERT =================================
@@ -148,11 +156,11 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
     # xlnet = decode(xlnet_tokenizer, predict[0, 0, :].topk(top_k).indices.tolist(), top_clean)
 
     # # ========================= XLM ROBERTA BASE =================================
-    print(f"Rest input: Prompt: {text_sentence} question: {question} {joined_t5}+ The correct choice is choice number: <mask>")
-    input_ids, mask_idx = encode(xlmroberta_tokenizer, f"Prompt: {text_sentence} question: {question} {joined_t5}+ The correct choice is choice number: <mask>", add_special_tokens=True)
+    print(f"Rest input: Prompt: {text_sentence} question: {question} {joined_t5} The correct choice is choice number: <mask>")
+    input_ids, mask_idx = encode(xlmroberta_tokenizer, f"Prompt: {text_sentence} question: {question} {joined_t5} The correct choice is choice number: <mask>", add_special_tokens=True)
     with torch.no_grad():
         predict = xlmroberta_model(input_ids)[0]
-    xlm = decode(xlmroberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    xlm = decode_plus(xlmroberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean, choices)
 
     # # ========================= BART =================================
     # input_ids, mask_idx = encode(bart_tokenizer, text_sentence, add_special_tokens=True)
@@ -167,10 +175,10 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
     # electra = decode(electra_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
 
     # # ========================= ROBERTA =================================
-    input_ids, mask_idx = encode(roberta_tokenizer, f"Prompt: {text_sentence} question: {question} {joined_t5}+ The correct choice is choice number: <mask>", add_special_tokens=True)
+    input_ids, mask_idx = encode(roberta_tokenizer, f"Prompt: {text_sentence} question: {question} {joined_t5} The correct choice is choice number: <mask>", add_special_tokens=True)
     with torch.no_grad():
         predict = roberta_model(input_ids)[0]
-    roberta = decode(roberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean)
+    roberta = decode_plus(roberta_tokenizer, predict[0, mask_idx, :].topk(top_k).indices.tolist(), top_clean, choices)
 
     opdct = {'uqalarge': uqa_large,
             'uqa3B' : uqa_3b,

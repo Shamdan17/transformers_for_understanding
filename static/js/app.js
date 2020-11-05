@@ -122,8 +122,62 @@ jQuery(document).ready(function () {
         });
         // }
     })
+        $('#btn-randomize-cqa-test').on('click', function () {
+        // if (e.key == ' ') {
+            $.ajax({
+                url: '/get_random_cqa_tst',
+                type: "post",
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify({
+                    "NA": "NA",
+                }),
+                beforeSend: function () {
+                    $('.overlay').show()
+                },
+                complete: function () {
+                    $('.overlay').hide()
+                }
+            }).done(function (jsondata, textStatus, jqXHR) {
+                console.log(jsondata)
+                $('#ca_input_text').val(jsondata["prompt"])
+                $('#ca_input_q').val(jsondata["question"])
+                $('#ca_input_choices').val(jsondata["choices"])
+                $('#gld').val(jsondata["gold"])
+            }).fail(function (jsondata, textStatus, jqXHR) {
+                console.log(jsondata)
+        });
+        // }
+    })
 
-
+        $('#btn-randomize-cqa-valid').on('click', function () {
+        // if (e.key == ' ') {
+            $.ajax({
+                url: '/get_random_cqa_val',
+                type: "post",
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify({
+                    "NA": "NA",
+                }),
+                beforeSend: function () {
+                    $('.overlay').show()
+                },
+                complete: function () {
+                    $('.overlay').hide()
+                }
+            }).done(function (jsondata, textStatus, jqXHR) {
+                console.log(jsondata)
+                $('#gld').val("NO THANKS")
+                $('#ca_input_text').val(jsondata["prompt"])
+                $('#ca_input_q').val(jsondata["question"])
+                $('#ca_input_choices').val(jsondata["choices"])
+                $('#gld').val(jsondata["gold"])
+            }).fail(function (jsondata, textStatus, jqXHR) {
+                console.log(jsondata)
+        });
+        // }
+    })
 
     // $('#btn-process').on('click', function () {
     //     $.ajax({

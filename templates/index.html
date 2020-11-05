@@ -32,16 +32,32 @@
             <div class="form-row">
                 <div class="form-group col-md-8">
                     <br>
-                    <h4>Cosmos QA: Type a prompt, a question, and atleast one choice seperated by a newline and press space to get suggestions</h4>
+                    <h4>Cosmos QA: Type a prompt, a question, and atleast one choice seperated by a newline.</h4>
                 </div>
                 <div class="form-group col-md-2">
                     <br>
-                    <label for="max_words" id="label_max_words">Top k choices: 2</label>
-                    <input type="range" class="custom-range" min="1" max="4" value="2" step="1" id="max_words">
+                    <label for="max_words" id="label_max_words">Top k choices: 1</label>
+                    <input type="range" class="custom-range" min="1" max="4" value="1" step="1" id="max_words">
                 </div>
                 <div class="form-group col-md-2">
                     <label></label>
                     <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-process-cqa">Predict</button>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <!-- <label></label> -->
+                    <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-randomize-cqa-test">Random Question (Test Set)</button>
+                </div>
+                <div class="form-group col-md-3">
+                    <!-- <label></label> -->
+                    <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-randomize-cqa-valid">Random Question (Val Set)</button>
+                </div>
+                <div class="form-group col-md-6">
+                    <!-- <label for="text_paragraphs"></label> -->
+                    <textarea class="form-control txt_input" id="gld" rows="1" readonly="">Answer: The writer has a phyiscal disability.</textarea>
+                    <!-- <h5 id="gld">Change this</h5>  -->
+                    <!-- <textarea class="form-control txt_response" id="valid-rnd-label" readonly></textarea> -->
                 </div>
             </div>
 
@@ -82,11 +98,11 @@ None of the above choices.</textarea>
                     <textarea class="form-control txt_response" id="text_T5_3B" readonly></textarea>
                 </div>
                 <div class="form-group col-md-2">
-                    <label for="text_paragraphs">XLM RoBERTa</label>
+                    <label for="text_paragraphs">XLM RoBERTa*</label>
                     <textarea class="form-control txt_response" id="text_xlm" readonly></textarea>
                 </div>
                 <div class="form-group col-md-2">
-                    <label for="text_paragraphs">RoBERTa B</label>
+                    <label for="text_paragraphs">RoBERTa*</label>
                     <textarea class="form-control txt_response" id="text_roberta" readonly></textarea>
                 </div>
                 <!-- <div class="form-group col-md-2">
@@ -97,7 +113,7 @@ None of the above choices.</textarea>
             <hr>
 
             <!-- MASKED PREDICTION -->
-            <center>
+           <!--  <center>
                 <h3>Masked Word Prediction</h3>
             </center>
 
@@ -153,6 +169,6 @@ None of the above choices.</textarea>
         </div>
         <div class="col-sm-1"></div>
     </div>
-</body>
+ --></body>
 
 </html>
