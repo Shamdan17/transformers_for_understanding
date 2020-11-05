@@ -106,7 +106,7 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
 
     joined_t5 = []
     for i, choice in enumerate(choices):
-        joined.append(f"choice {i}: <{choice}>")
+        joined_t5.append(f"choice {i}: <{choice}>")
     joined_t5 = " ".join(joined)
 
     t5_inp = f"question: <{question}> {joined_t5} article {text_sentence}"
