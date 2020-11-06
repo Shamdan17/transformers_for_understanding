@@ -16,6 +16,10 @@ test_n = len(test_lines)
 def index():
     return render_template('index.html')
 
+@app.route('/help.html')
+def help():
+    return render_template('help.html')
+
 
 @app.route('/get_end_predictions', methods=['post'])
 def get_prediction_eos():
@@ -82,4 +86,4 @@ def get_prediction_mask():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=8383, use_reloader=False)
+    app.run(host='0.0.0.0', debug=True, port=8382, use_reloader=False)
