@@ -1,6 +1,9 @@
 # %%
 import torch
 import string
+import re
+from tokenization import BasicTokenizer
+t5_post_tokenizer = BasicTokenizer()
 
 # from transformers import BertTokenizer, BertForMaskedLM
 # bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
@@ -106,17 +109,22 @@ def num_to_choice(answers, choices):
                 pass
     return answers
 
+def uqa_prep(text):
+    return re.sub("'(.*)'", r"\1", text.lower())
 
 
 def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
     # ========================= Unified QA ================================
     uqa_input = question
-    choices = choices.split('\n')
+    choices = choices.strip().split('\n')
     joined = []
     for i, choice in enumerate(choices):
         joined.append(f"({chr(ord('a')+i)}) {choice}")
     joined = " ".join(joined)
-    uqa_input = f"{question} \\n {joined} \\n {text_sentence}"
+    if joined:
+        joined = f"\\n {joined}"
+    uqa_input = f"{question} {joined} \\n {text_sentence}"
+    uqa_input = uqa_prep(uqa_input)
     print(f"uqa input: {uqa_input}")
     uqa_large = '\n'.join(run_t5(uqa_input, unifiedqa_t5_large, unifiedqa_t5_large_tok, num_beams=2*top_clean, num_return_sequences=top_clean))
     # print(uqa_large)
@@ -126,10 +134,10 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
 
     joined_t5 = []
     for i, choice in enumerate(choices):
-        joined_t5.append(f"choice {i}: <{choice}>")
+        joined_t5.append(f"choice {i}: <{t5_post_tokenizer.tokenize(choice)}>")
     joined_t5 = " ".join(joined_t5)
 
-    t5_inp = f"question: <{question}> {joined_t5} article {text_sentence}"
+    t5_inp = f"question: <{t5_post_tokenizer.tokenize(question)}> {joined_t5} article {t5_post_tokenizer.tokenize(text_sentence)}"
 
     print(f"t5 input: {t5_inp}")
     t5_large_op = '\n'.join(run_pt_t5("trivia question: " + t5_inp.lower(), t5_large, t5_large_tok, choices,  num_beams=2*top_clean, num_return_sequences=top_clean))
