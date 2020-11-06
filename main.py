@@ -112,6 +112,8 @@ def num_to_choice(answers, choices):
 def uqa_prep(text):
     return re.sub("'(.*)'", r"\1", text.lower())
 
+def t5_prep(text):
+    return " ".join(t5_post_tokenizer.tokenize(text))
 
 def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
     # ========================= Unified QA ================================
@@ -134,10 +136,10 @@ def get_all_predictions(text_sentence, question="", choices="", top_clean=5):
 
     joined_t5 = []
     for i, choice in enumerate(choices):
-        joined_t5.append(f"choice {i}: <{t5_post_tokenizer.tokenize(choice)}>")
+        joined_t5.append(f"choice {i}: <{t5_prep(choice)}>")
     joined_t5 = " ".join(joined_t5)
 
-    t5_inp = f"question: <{t5_post_tokenizer.tokenize(question)}> {joined_t5} article {t5_post_tokenizer.tokenize(text_sentence)}"
+    t5_inp = f"question: <{t5_prep(question)}> {joined_t5} article {t5_prep(text_sentence)}"
 
     print(f"t5 input: {t5_inp}")
     t5_large_op = '\n'.join(run_pt_t5("trivia question: " + t5_inp.lower(), t5_large, t5_large_tok, choices,  num_beams=2*top_clean, num_return_sequences=top_clean))
