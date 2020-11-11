@@ -122,6 +122,16 @@ jQuery(document).ready(function () {
         });
         // }
     })
+
+        $('#Dataset').on('change', function(){
+            if($('#Dataset').val()=='cosmos'){
+                $('#btn-randomize-cqa-test').removeAttr('disabled');
+            } else {                
+                $('#btn-randomize-cqa-test').attr('disabled','disabled');
+            }
+        })
+
+
         $('#btn-randomize-cqa-test').on('click', function () {
         // if (e.key == ' ') {
             $.ajax({
@@ -130,7 +140,7 @@ jQuery(document).ready(function () {
                 contentType: "application/json",
                 dataType: "json",
                 data: JSON.stringify({
-                    "NA": "NA",
+                    "dataset": $('#Dataset').val(),
                 }),
                 beforeSend: function () {
                     $('.overlay').show()
@@ -158,7 +168,7 @@ jQuery(document).ready(function () {
                 contentType: "application/json",
                 dataType: "json",
                 data: JSON.stringify({
-                    "NA": "NA",
+                    "dataset": $('#Dataset').val(),
                 }),
                 beforeSend: function () {
                     $('.overlay').show()

@@ -32,7 +32,7 @@
             <div class="form-row">
                 <div class="form-group col-md-8">
                     <br>
-                    <h4>Cosmos QA: Type a prompt, a question, and atleast one choice seperated by a newline. <a href="help.html">[HELP]</a></h4>
+                    <h4>Type a prompt, a question, and atleast one choice seperated by a newline.<a href="help.html">[HELP]</a></h4>
                 </div>
                 <div class="form-group col-md-2">
                     <br>
@@ -45,19 +45,34 @@
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-md-3">
-                    <!-- <label></label> -->
-                    <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-randomize-cqa-test">Random Question (Test Set)</button>
+                <div class="col-md-1">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <select name="Dataset" id="Dataset">
+                                <option value="cosmos" selected>CosmosQA</option>
+                                <option value="social">SocialIQA</option>
+                                <option value="john">McCarthy</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group col-md-3">
-                    <!-- <label></label> -->
-                    <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-randomize-cqa-valid">Random Question (Val Set)</button>
-                </div>
-                <div class="form-group col-md-6">
-                    <!-- <label for="text_paragraphs"></label> -->
-                    <textarea class="form-control txt_input" id="gld" rows="1" readonly="">Answer: The writer has a phyiscal disability.</textarea>
-                    <!-- <h5 id="gld">Change this</h5>  -->
-                    <!-- <textarea class="form-control txt_response" id="valid-rnd-label" readonly></textarea> -->
+                <div class="col-md-11">
+                    <div class="row">
+                        <div class="form-group col-md-3">
+                            <!-- <label></label> -->
+                            <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-randomize-cqa-test">Random Question (Test Set)</button>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <!-- <label></label> -->
+                            <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-randomize-cqa-valid">Random Question (Val Set)</button>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <!-- <label for="text_paragraphs"></label> -->
+                            <textarea class="form-control txt_input" id="gld" rows="1" readonly="">Correct Answer: The writer has a phyiscal disability.</textarea>
+                            <!-- <h5 id="gld">Change this</h5>  -->
+                            <!-- <textarea class="form-control txt_response" id="valid-rnd-label" readonly></textarea> -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
